@@ -3,18 +3,48 @@ import shutil
 import tkinter as tk
 from tkinter import messagebox
 from tkinter import ttk
+from tkinter import filedialog
+import glob
+import json
 
-# Define paths for both games
-ds3_path = 'C:\\Users\\benjo\\AppData\\Roaming\\DarkSoulsIII\\01100001135b0a20\\ds30000.sl2'
-elden_ring_path = 'C:\\Users\\benjo\\AppData\\Roaming\\EldenRing\\76561198284999200\\ER0000.sl2'
-destination_dir = 'D:\\Temporary Souls Like Save Files'
+# Define base paths for both games dynamically
+appdata_roaming = os.getenv('APPDATA')
+ds3_base_path = os.path.join(appdata_roaming, 'DarkSoulsIII')
+elden_ring_base_path = os.path.join(appdata_roaming, 'EldenRing')
+config_file = os.path.join(os.path.expanduser('~'), 'ds3_auto_save_config.json')
+
+# Load configuration
+def load_config():
+    if os.path.exists(config_file):
+        with open(config_file, 'r') as f:
+            config = json.load(f)
+            return config.get('destination_dir', None)
+    return None
+
+# Save configuration
+def save_config(destination_dir):
+    with open(config_file, 'w') as f:
+        json.dump({'destination_dir': destination_dir}, f)
+
+# Initialize destination directory
+destination_dir = load_config()
+
+# Function to find the .sl2 file for the selected game
+def find_sl2_file(base_path, game_name):
+    search_pattern = os.path.join(base_path, '**', '*.sl2')
+    sl2_files = glob.glob(search_pattern, recursive=True)
+    if game_name == "Elden Ring":
+        sl2_files = [f for f in sl2_files if not f.endswith('.sl2.bak')]
+    return sl2_files[0] if sl2_files else None
 
 # Function to get the selected game path
 def get_game_path(game):
     if game == "Dark Souls 3":
-        return ds3_path, os.path.join(destination_dir, 'Dark Souls III Save File')
+        path = find_sl2_file(ds3_base_path, game)
+        return path, os.path.join(destination_dir, 'Dark Souls III Save File')
     elif game == "Elden Ring":
-        return elden_ring_path, os.path.join(destination_dir, 'Elden Ring Save File')
+        path = find_sl2_file(elden_ring_base_path, game)
+        return path, os.path.join(destination_dir, 'Elden Ring Save File')
     else:
         return None, None
 
@@ -23,7 +53,7 @@ def copy_file():
     path, sub_dir = get_game_path(game)
     destination_file = os.path.join(sub_dir, os.path.basename(path))
     
-    if os.path.exists(path):
+    if path and os.path.exists(path):
         if not os.path.exists(sub_dir):
             os.makedirs(sub_dir)
         shutil.copyfile(path, destination_file)
@@ -58,6 +88,13 @@ def select_game(event):
     delete_button.config(state=tk.NORMAL)
     load_button.config(state=tk.NORMAL)
 
+def choose_destination():
+    global destination_dir
+    destination_dir = filedialog.askdirectory()
+    if destination_dir:
+        save_config(destination_dir)
+        messagebox.showinfo("Success", f"Destination folder set to {destination_dir}")
+
 # Create the main window
 root = tk.Tk()
 root.title("Save File Manager")
@@ -83,6 +120,10 @@ delete_button.pack(pady=20)
 
 load_button = tk.Button(root, text="Load File", command=load_file, width=30, height=3, bg="lightgreen", font=("Helvetica", 14), state=tk.DISABLED)
 load_button.pack(pady=20)
+
+# Check if destination directory is set, if not prompt the user
+if not destination_dir:
+    choose_destination()
 
 # Run the application
 root.mainloop()
