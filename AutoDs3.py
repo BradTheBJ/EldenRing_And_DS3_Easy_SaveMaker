@@ -57,22 +57,26 @@ root = tk.Tk()
 root.title("Save File Manager")
 root.geometry("800x600")  # Set the window size
 
+# Add a label for instructions
+label = tk.Label(root, text="Select the game and choose an action:", font=("Helvetica", 16))
+label.pack(pady=20)
+
 # Create a dropdown menu to select the game
 game_var = tk.StringVar(root)
 game_var.set("Select Game")  # Default value
 
 game_menu = tk.OptionMenu(root, game_var, "Dark Souls 3", "Elden Ring")
-game_menu.config(width=30, height=2)
+game_menu.config(width=30, height=2, font=("Helvetica", 14))
 game_menu.pack(pady=20)
 
-# Create and place the buttons
-copy_button = tk.Button(root, text="Copy File", command=copy_file, width=30, height=3)
+# Create and place the buttons with styling
+copy_button = tk.Button(root, text="Copy File", command=copy_file, width=30, height=3, bg="lightblue", font=("Helvetica", 14))
 copy_button.pack(pady=20)
 
-delete_button = tk.Button(root, text="Delete Folder", command=delete_file, width=30, height=3)
+delete_button = tk.Button(root, text="Delete Folder", command=delete_file, width=30, height=3, bg="lightcoral", font=("Helvetica", 14))
 delete_button.pack(pady=20)
 
-load_button = tk.Button(root, text="Load File", command=load_file, width=30, height=3)
+load_button = tk.Button(root, text="Load File", command=load_file, width=30, height=3, bg="lightgreen", font=("Helvetica", 14))
 load_button.pack(pady=20)
 
 # Run the application
