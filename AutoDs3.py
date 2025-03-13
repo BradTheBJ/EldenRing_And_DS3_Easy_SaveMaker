@@ -2,6 +2,7 @@ import os
 import shutil
 import tkinter as tk
 from tkinter import messagebox
+from tkinter import ttk
 
 # Define paths for both games
 ds3_path = 'C:\\Users\\benjo\\AppData\\Roaming\\DarkSoulsIII\\01100001135b0a20\\ds30000.sl2'
@@ -52,6 +53,11 @@ def load_file():
     else:
         messagebox.showerror("Error", "Save file not found in the save file folder")
 
+def select_game(event):
+    copy_button.config(state=tk.NORMAL)
+    delete_button.config(state=tk.NORMAL)
+    load_button.config(state=tk.NORMAL)
+
 # Create the main window
 root = tk.Tk()
 root.title("Save File Manager")
@@ -63,20 +69,19 @@ label.pack(pady=20)
 
 # Create a dropdown menu to select the game
 game_var = tk.StringVar(root)
-game_var.set("Select Game")  # Default value
-
-game_menu = tk.OptionMenu(root, game_var, "Dark Souls 3", "Elden Ring")
-game_menu.config(width=30, height=2, font=("Helvetica", 14))
+game_menu = ttk.Combobox(root, textvariable=game_var, values=["Dark Souls 3", "Elden Ring"], font=("Helvetica", 14), state="readonly")
+game_menu.set("Select Game")  # Default value
+game_menu.bind("<<ComboboxSelected>>", select_game)
 game_menu.pack(pady=20)
 
-# Create and place the buttons with styling
-copy_button = tk.Button(root, text="Copy File", command=copy_file, width=30, height=3, bg="lightblue", font=("Helvetica", 14))
+# Create and place the action buttons with styling
+copy_button = tk.Button(root, text="Copy File", command=copy_file, width=30, height=3, bg="lightblue", font=("Helvetica", 14), state=tk.DISABLED)
 copy_button.pack(pady=20)
 
-delete_button = tk.Button(root, text="Delete Folder", command=delete_file, width=30, height=3, bg="lightcoral", font=("Helvetica", 14))
+delete_button = tk.Button(root, text="Delete Folder", command=delete_file, width=30, height=3, bg="lightcoral", font=("Helvetica", 14), state=tk.DISABLED)
 delete_button.pack(pady=20)
 
-load_button = tk.Button(root, text="Load File", command=load_file, width=30, height=3, bg="lightgreen", font=("Helvetica", 14))
+load_button = tk.Button(root, text="Load File", command=load_file, width=30, height=3, bg="lightgreen", font=("Helvetica", 14), state=tk.DISABLED)
 load_button.pack(pady=20)
 
 # Run the application
